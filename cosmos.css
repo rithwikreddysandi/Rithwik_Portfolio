@@ -1,0 +1,167 @@
+/* ============================================
+   Cosmos Hero Layer — grid + starfield + nebula
+   Loaded AFTER style.css so it overrides the hero.
+   ============================================ */
+
+/* Theme-aware tokens (style.css references --grid-line but never defines it) */
+:root {
+    --grid-line: rgba(140, 150, 210, 0.10);
+    --star: rgba(255, 255, 255, 0.95);
+    --nebula-1: rgba(124, 108, 255, 0.20);
+    --nebula-2: rgba(34, 211, 238, 0.14);
+    --nebula-3: rgba(192, 132, 252, 0.16);
+}
+
+[data-theme="light"] {
+    --grid-line: rgba(76, 89, 148, 0.18);
+    --star: rgba(70, 80, 140, 0.75);
+    --nebula-1: rgba(124, 108, 255, 0.12);
+    --nebula-2: rgba(34, 211, 238, 0.08);
+    --nebula-3: rgba(192, 132, 252, 0.10);
+}
+
+/* Nebula glows painted straight onto the hero background */
+.hero {
+    background:
+        radial-gradient(45% 40% at 18% 22%, var(--nebula-1) 0%, transparent 60%),
+        radial-gradient(40% 38% at 82% 30%, var(--nebula-3) 0%, transparent 60%),
+        radial-gradient(50% 45% at 68% 82%, var(--nebula-2) 0%, transparent 60%),
+        var(--bg) !important;
+}
+
+/* Grid lines — now actually visible via the defined --grid-line token */
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 54px 54px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 45%, transparent 82%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 45%, transparent 82%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Starfield — three parallax layers of twinkling stars + a shooting star.
+   Injected by script.js as <div class="hero-stars"> inside .hero */
+.hero-stars {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-stars .layer {
+    position: absolute;
+    inset: -50%;
+    background-repeat: repeat;
+}
+
+/* Small dense stars */
+.hero-stars .layer.stars-sm {
+    background-image:
+        radial-gradient(1px 1px at 20px 30px, var(--star), transparent),
+        radial-gradient(1px 1px at 120px 80px, var(--star), transparent),
+        radial-gradient(1px 1px at 200px 150px, var(--star), transparent),
+        radial-gradient(1px 1px at 300px 60px, var(--star), transparent),
+        radial-gradient(1px 1px at 380px 200px, var(--star), transparent),
+        radial-gradient(1px 1px at 90px 240px, var(--star), transparent),
+        radial-gradient(1px 1px at 250px 300px, var(--star), transparent),
+        radial-gradient(1px 1px at 420px 120px, var(--star), transparent);
+    background-size: 480px 360px;
+    opacity: 0.55;
+    animation: twinkle 4s ease-in-out infinite, drift 140s linear infinite;
+}
+
+/* Medium stars */
+.hero-stars .layer.stars-md {
+    background-image:
+        radial-gradient(1.6px 1.6px at 60px 90px, var(--star), transparent),
+        radial-gradient(1.6px 1.6px at 180px 40px, var(--star), transparent),
+        radial-gradient(1.6px 1.6px at 320px 180px, var(--star), transparent),
+        radial-gradient(1.6px 1.6px at 460px 260px, var(--star), transparent),
+        radial-gradient(1.6px 1.6px at 140px 300px, var(--star), transparent);
+    background-size: 620px 460px;
+    opacity: 0.7;
+    animation: twinkle 6s ease-in-out infinite 1s, drift 200s linear infinite reverse;
+}
+
+/* Large bright stars with a soft glow */
+.hero-stars .layer.stars-lg {
+    background-image:
+        radial-gradient(2.4px 2.4px at 100px 120px, #fff, transparent),
+        radial-gradient(2.4px 2.4px at 400px 220px, #fff, transparent),
+        radial-gradient(2.2px 2.2px at 260px 340px, #cfd3ff, transparent);
+    background-size: 760px 560px;
+    opacity: 0.85;
+    filter: drop-shadow(0 0 3px rgba(180, 190, 255, 0.6));
+    animation: twinkle 5s ease-in-out infinite 0.5s, drift 260s linear infinite;
+}
+
+[data-theme="light"] .hero-stars .layer.stars-lg {
+    filter: none;
+}
+
+/* Shooting star */
+.hero-stars .shooting-star {
+    position: absolute;
+    top: 12%;
+    left: 60%;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0));
+    border-radius: 2px;
+    opacity: 0;
+    transform: rotate(28deg);
+    filter: drop-shadow(0 0 6px rgba(160, 200, 255, 0.8));
+    animation: shoot 7s ease-in-out infinite;
+}
+
+.hero-stars .shooting-star::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 8px 2px rgba(200, 220, 255, 0.9);
+}
+
+[data-theme="light"] .hero-stars .shooting-star {
+    background: linear-gradient(90deg, #6d7bff, rgba(109, 123, 255, 0));
+}
+
+/* Keep hero content above the cosmos layers */
+.hero-inner {
+    z-index: 3 !important;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.9; }
+}
+
+@keyframes drift {
+    from { transform: translate(0, 0); }
+    to { transform: translate(-60px, -40px); }
+}
+
+@keyframes shoot {
+    0% { transform: translate(0, 0) rotate(28deg); opacity: 0; }
+    8% { opacity: 1; }
+    18% { transform: translate(-420px, 230px) rotate(28deg); opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .hero-stars .layer,
+    .hero-stars .shooting-star {
+        animation: none;
+    }
+}
